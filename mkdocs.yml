@@ -7,7 +7,6 @@ strict: true
 
 nav:
     - Introduction: index.md
-    - whats-new-in-v4.md
     - getting-started.md
     - Defining Commands:
       - DefiningCommands/argument-terminology.md
@@ -44,6 +43,10 @@ nav:
       - Extras/directives.md
       - Extras/exceptions.md
     - test-tools.md
+    - Release Notes:
+      - Version 4: ReleaseNotes/v4.md
+      - Version 3: ReleaseNotes/v3.md
+
 theme:
   feature:
     tabs: false
