@@ -37,7 +37,7 @@ namespace CommandDotNet.Parsing
 
         private static Task<int> Middleware(CommandContext ctx, ExecutionDelegate next)
         {
-            if (ctx.ParseResult.ParseError != null 
+            if (ctx.ParseResult!.ParseError != null 
                 && ctx.ParseResult.ParseError is CommandParsingException cpe 
                 && cpe.UnrecognizedArgument != null)
             {
@@ -61,16 +61,16 @@ namespace CommandDotNet.Parsing
         private static bool TrySuggest(
             CommandContext ctx, CommandParsingException cpe, 
             IReadOnlyCollection<IArgumentNode> argumentNodes, 
-            string argumentNodeType, string prefix)
+            string argumentNodeType, string? prefix)
         {
             if (!argumentNodes.Any())
             {
                 return false;
             }
 
-            var config = ctx.AppConfig.Services.Get<Config>();
+            var config = ctx.AppConfig.Services.GetOrThrow<Config>();
 
-            var typo = cpe.UnrecognizedArgument.Value;
+            var typo = cpe.UnrecognizedArgument!.Value;
             var suggestions = argumentNodes
                 .SelectMany(o => o.Aliases.Where(a => a.Length > 1)) // skip short names
                 .GetSuggestions(typo, config.MaxSuggestionCount)

@@ -14,12 +14,14 @@ namespace CommandDotNet.Execution
         public ICollection<InvocationStep> AncestorInterceptors { get; set; } = new List<InvocationStep>();
 
         /// <summary>The invocation for the <see cref="ParseResult.TargetCommand"/></summary>
-        public InvocationStep TargetCommand { get; set; }
+        public InvocationStep? TargetCommand { get; set; }
 
         /// <summary>
         /// Joins <see cref="AncestorInterceptors"/> and <see cref="TargetCommand"/> with top-most parent
         /// first and <see cref="TargetCommand"/> last.
         /// </summary>
-        public IEnumerable<InvocationStep> All => AncestorInterceptors.Concat(TargetCommand.ToEnumerable());
+        public IEnumerable<InvocationStep> All => TargetCommand == null
+            ? AncestorInterceptors
+            : AncestorInterceptors.Concat(TargetCommand.ToEnumerable());
     }
 }

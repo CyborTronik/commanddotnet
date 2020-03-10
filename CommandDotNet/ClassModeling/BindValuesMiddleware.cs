@@ -28,6 +28,7 @@ namespace CommandDotNet.ClassModeling
                 }
                 catch (ValueParsingException ex)
                 {
+                    // TODO: the second iteration of values could misbehave when values is a stream (piped input)
                     console.Error.WriteLine($"Failure parsing value for {argument}.  values={values?.ToCsv()}");
                     console.Error.WriteLine(ex.Message);
                     console.Error.WriteLine();
@@ -36,7 +37,7 @@ namespace CommandDotNet.ClassModeling
                 }
             }
 
-            var arguments = commandContext.InvocationPipeline.All
+            var arguments = commandContext.InvocationPipeline!.All
                 .SelectMany(ic => ic.Command.Options.Cast<IArgument>().Union(ic.Command.Operands))
                 .Where(a => a.GetArgumentDef() != null);
 

@@ -4,9 +4,9 @@ namespace CommandDotNet.Extensions
 {
     public static class ServicesExtensions
     {
-        public static T GetOrAdd<T>(this IServices services, T key, Func<T> addCallback)
+        public static T GetOrAdd<T>(this IServices services, T key, Func<T> addCallback) where T: class
         {
-            var service = services.Get<T>();
+            var service = services.GetOrDefault<T>();
             
             if (service == null)
             {

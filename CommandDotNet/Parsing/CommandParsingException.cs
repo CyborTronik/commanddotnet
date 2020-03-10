@@ -10,9 +10,9 @@ namespace CommandDotNet.Parsing
     {
         public Command Command { get; }
 
-        public Token UnrecognizedArgument { get; }
+        public Token? UnrecognizedArgument { get; }
 
-        public CommandParsingException(Command command, string message, Token unrecognizedArgument = null)
+        public CommandParsingException(Command command, string message, Token? unrecognizedArgument = null)
             : base(message)
         {
             Command = command;

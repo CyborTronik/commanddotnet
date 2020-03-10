@@ -21,14 +21,14 @@ namespace CommandDotNet
 
         /// <summary>
         /// The root command for the type specified in <see cref="AppRunner{TRootCommandType}"/>. 
-        /// This is populated in the <see cref="MiddlewareStages.Build"/> stage.
+        /// This is populated in the <see cref="MiddlewareStages.ParseInput"/> stage.
         /// </summary>
-        public Command RootCommand { get; set; }
+        public Command? RootCommand { get; set; }
 
         /// <summary>
         /// The results of the <see cref="MiddlewareStages.ParseInput"/> stage.
         /// </summary>
-        public ParseResult ParseResult { get; set; }
+        public ParseResult? ParseResult { get; set; }
 
         /// <summary>
         /// The <see cref="InvocationStep"/>s within the pipeline are mostly populated in
@@ -36,7 +36,7 @@ namespace CommandDotNet
         /// <see cref="InvocationStep.Instance"/> and <see cref="IInvocation.ParameterValues"/>
         /// are populated in the <see cref="MiddlewareStages.BindValues"/> stage.
         /// </summary>
-        public InvocationPipeline InvocationPipeline { get; } = new InvocationPipeline();
+        public InvocationPipeline? InvocationPipeline { get; } = new InvocationPipeline();
 
         public AppConfig AppConfig { get; }
 
@@ -57,7 +57,7 @@ namespace CommandDotNet
         /// Delegate from AppConfig. Included here for easier discovery
         /// and reduce confusion with <see cref="Services"/>
         /// </remarks>
-        public IDependencyResolver DependencyResolver => AppConfig.DependencyResolver;
+        public IDependencyResolver? DependencyResolver => AppConfig.DependencyResolver;
 
         public CommandContext(
             string[] originalArgs, 

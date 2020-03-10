@@ -24,7 +24,7 @@ namespace CommandDotNet
     /// <typeparam name="TRootCommandType">Type of the application</typeparam>
     public class AppRunner<TRootCommandType> : AppRunner where TRootCommandType : class
     {
-        public AppRunner(AppSettings settings = null) : base(typeof(TRootCommandType), settings) { }
+        public AppRunner(AppSettings? settings = null) : base(typeof(TRootCommandType), settings) { }
     }
 
     /// <summary>
@@ -41,7 +41,7 @@ namespace CommandDotNet
 
         internal AppConfig AppConfig { get; private set; }
 
-        public AppRunner(Type rootCommandType, AppSettings settings = null)
+        public AppRunner(Type rootCommandType, AppSettings? settings = null)
         {
             RootCommandType = rootCommandType ?? throw new ArgumentNullException(nameof(rootCommandType));
             AppSettings = settings ?? new AppSettings();

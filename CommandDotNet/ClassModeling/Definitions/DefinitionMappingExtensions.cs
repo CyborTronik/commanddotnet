@@ -9,7 +9,7 @@ namespace CommandDotNet.ClassModeling.Definitions
 {
     internal static class DefinitionMappingExtensions
     {
-        internal static ICommandBuilder ToCommand(this ICommandDef commandDef, Command parent, CommandContext commandContext)
+        internal static ICommandBuilder ToCommand(this ICommandDef commandDef, Command? parent, CommandContext commandContext)
         {
             var command = new Command(
                 commandDef.Name, 
@@ -30,12 +30,12 @@ namespace CommandDotNet.ClassModeling.Definitions
 
             var commandBuilder = new CommandBuilder(command);
 
-            commandDef.InvokeMethodDef.ArgumentDefs
-                .Select(a => a.ToArgument(command, commandContext.AppConfig, false))
+            commandDef.InvokeMethodDef?.ArgumentDefs
+                .Select(a => a.ToArgument(commandContext.AppConfig, false))
                 .ForEach(commandBuilder.AddArgument);
 
-            commandDef.InterceptorMethodDef.ArgumentDefs
-                .Select(a => a.ToArgument(command, commandContext.AppConfig, true))
+            commandDef.InterceptorMethodDef?.ArgumentDefs
+                .Select(a => a.ToArgument(commandContext.AppConfig, true))
                 .ForEach(commandBuilder.AddArgument);
 
             commandDef.SubCommands
@@ -47,13 +47,12 @@ namespace CommandDotNet.ClassModeling.Definitions
             return commandBuilder;
         }
 
-        private static IArgument ToArgument(this IArgumentDef argumentDef, Command parent, AppConfig appConfig, bool isInterceptorOption)
+        private static IArgument ToArgument(this IArgumentDef argumentDef, AppConfig appConfig, bool isInterceptorOption)
         {
             var underlyingType = argumentDef.Type.GetUnderlyingType();
 
             var argument = BuildArgument(
-                argumentDef, 
-                parent,
+                argumentDef,
                 appConfig,
                 new TypeInfo(argumentDef.Type, underlyingType), 
                 isInterceptorOption);
@@ -71,7 +70,6 @@ namespace CommandDotNet.ClassModeling.Definitions
         }
 
         private static IArgument BuildArgument(IArgumentDef argumentDef,
-            Command parent,
             AppConfig appConfig,
             TypeInfo typeInfo,
             bool isInterceptorOption)
@@ -83,8 +81,8 @@ namespace CommandDotNet.ClassModeling.Definitions
             if (argumentDef.CommandNodeType == CommandNodeType.Operand)
             {
                 var operandAttr = argumentDef.CustomAttributes.GetCustomAttribute<OperandAttribute>() 
-                                  ?? (INameAndDescription) argumentDef.CustomAttributes.GetCustomAttribute<ArgumentAttribute>();
-                return new Operand(
+                                  ?? (INameAndDescription?) argumentDef.CustomAttributes.GetCustomAttribute<ArgumentAttribute>();
+                var operand = new Operand(
                     argumentDef.Name,
                     typeInfo,
                     ArgumentArity.Default(argumentDef.Type, argumentDef.HasDefaultValue, BooleanMode.Explicit), 
@@ -95,6 +93,8 @@ namespace CommandDotNet.ClassModeling.Definitions
                     Description = operandAttr?.Description,
                     Default = defaultValue
                 };
+                operand.Services.Add(new Box<BooleanMode>(BooleanMode.Explicit));
+                return operand;
             }
             
             if (argumentDef.CommandNodeType == CommandNodeType.Option)
@@ -106,11 +106,8 @@ namespace CommandDotNet.ClassModeling.Definitions
                 var assignOnlyToExecutableSubcommands = optionAttr?.AssignToExecutableSubcommands ?? false;
                 isInterceptorOption = isInterceptorOption && !assignOnlyToExecutableSubcommands;
 
-                var longName = optionAttr?.ShortName != null 
-                    ? optionAttr?.LongName 
-                    : (optionAttr?.LongName ?? argumentDef.Name);
-                return new Option(
-                    longName,
+                var option = new Option(
+                    ParseLongName(argumentDef, optionAttr),
                     ParseShortName(argumentDef, optionAttr?.ShortName),
                     typeInfo, 
                     argumentArity, 
@@ -123,14 +120,37 @@ namespace CommandDotNet.ClassModeling.Definitions
                     Description = optionAttr?.Description,
                     Default = defaultValue
                 };
+                option.Services.Add(new Box<BooleanMode>(booleanMode));
+                return option;
             }
 
             throw new ArgumentOutOfRangeException($"Unknown argument type: {argumentDef.CommandNodeType}");
         }
 
-        private static char? ParseShortName(IArgumentDef argumentDef, string shortNameAsString)
+        private static string? ParseLongName(IArgumentDef argumentDef, OptionAttribute? optionAttr)
         {
-            if (shortNameAsString.IsNullOrWhitespace())
+            if (optionAttr == null)
+            {
+                return argumentDef.Name;
+            }
+
+            if (optionAttr.LongName != null && !optionAttr.LongName.IsNullOrWhitespace())
+            {
+                return optionAttr.LongName;
+            }
+
+            if (optionAttr.ShortName.IsNullOrWhitespace())
+            {
+                // if there's no short name then the argument is still unnamed so use argument name
+                return argumentDef.Name;
+            }
+
+            return null;
+        }
+
+        private static char? ParseShortName(IArgumentDef argumentDef, string? shortNameAsString)
+        {
+            if (shortNameAsString == null || shortNameAsString.IsNullOrWhitespace())
             {
                 return null;
             }
@@ -145,7 +165,7 @@ namespace CommandDotNet.ClassModeling.Definitions
         }
 
         private static BooleanMode GetOptionBooleanMode(
-            IArgumentDef argumentDef, BooleanMode appBooleanMode, OptionAttribute optionAttr)
+            IArgumentDef argumentDef, BooleanMode appBooleanMode, OptionAttribute? optionAttr)
         {
             if (optionAttr == null || optionAttr.BooleanMode == BooleanMode.Unknown)
                 return appBooleanMode;

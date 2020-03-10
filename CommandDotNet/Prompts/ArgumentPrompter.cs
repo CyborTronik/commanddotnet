@@ -6,18 +6,18 @@ namespace CommandDotNet.Prompts
 {
     public class ArgumentPrompter : IArgumentPrompter
     {
-        private readonly Func<CommandContext, IArgument, string> _getPromptTextCallback;
+        private readonly Func<CommandContext, IArgument, string>? _getPromptTextCallback;
         private readonly IPrompter _prompter;
 
         public ArgumentPrompter(
             IPrompter prompter,
-            Func<CommandContext, IArgument, string> getPromptTextCallback = null)
+            Func<CommandContext, IArgument, string>? getPromptTextCallback = null)
         {
             _prompter = prompter;
             _getPromptTextCallback = getPromptTextCallback;
         }
 
-        public virtual ICollection<string> PromptForArgumentValues(
+        public ICollection<string> PromptForArgumentValues(
             CommandContext commandContext, IArgument argument, out bool isCancellationRequested)
         {
             var argumentName = _getPromptTextCallback?.Invoke(commandContext, argument) ?? argument.Name;

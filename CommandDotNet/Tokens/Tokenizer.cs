@@ -15,17 +15,17 @@ namespace CommandDotNet.Tokens
 
         public static Token Tokenize(string arg, bool includeDirectives = false)
         {
-            Token token;
+            Token? token;
             return (includeDirectives && TryTokenizeDirective(arg, out token))
                    || TryTokenizeSeparator(arg, out token)
                    || TryTokenizeOption(arg, out token)
-                ? token
+                ? token!
                 : TokenizeValue(arg);
         }
 
-        public static bool TryTokenizeDirective(string arg, out Token token)
+        public static bool TryTokenizeDirective(string arg, out Token? token)
         {
-            if (arg.Length > 2 && arg[0] == '[' && arg[arg.Length - 1] == ']')
+            if (arg.Length > 2 && arg[0] == '[' && arg[^1] == ']')
             {
                 token = new Token(arg, arg.Substring(1, arg.Length - 2), TokenType.Directive);
                 return true;
@@ -35,7 +35,7 @@ namespace CommandDotNet.Tokens
             return false;
         }
 
-        public static bool TryTokenizeSeparator(string arg, out Token token)
+        public static bool TryTokenizeSeparator(string arg, out Token? token)
         {
             if (arg == SeparatorString)
             {
@@ -47,7 +47,7 @@ namespace CommandDotNet.Tokens
             return false;
         }
 
-        public static bool TryTokenizeOption(string arg, out Token token)
+        public static bool TryTokenizeOption(string arg, out Token? token)
         {
             if (arg.Length <= 1 || arg[0] != '-' || arg.StartsWith("---"))
             {

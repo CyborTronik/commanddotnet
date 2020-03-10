@@ -78,7 +78,7 @@ namespace CommandDotNet.Tests.CommandDotNet.IoC
                 TestOutputs.Capture(new Services
                 {
                     FromCtor = _someService,
-                    FromInterceptor = (ISomeService)context.AppConfig.DependencyResolver.Resolve(typeof(ISomeService))
+                    FromInterceptor = (ISomeService)context.DependencyResolver.Resolve(typeof(ISomeService))
                 });
                 return next(context);
             }

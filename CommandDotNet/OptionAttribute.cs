@@ -6,11 +6,13 @@ namespace CommandDotNet
     public class OptionAttribute : Attribute, INameAndDescription
     {
         /// <summary>Must be a single character</summary>
-        public string ShortName { get; set; }
+        public string? ShortName { get; set; }
 
-        public string LongName { get; set; }
+        public string? LongName { get; set; }
 
-        string INameAndDescription.Name => LongName;
+        string? INameAndDescription.Name => LongName;
+
+        public string? Description { get; set; }
 
         /// <summary>
         /// The <see cref="BooleanMode"/> to use for this option.
@@ -31,7 +33,5 @@ namespace CommandDotNet
         /// Note: The Parent will still be the defining command, not the target command.
         /// </summary>
         public bool AssignToExecutableSubcommands { get; set; }
-
-        public string Description { get; set; }
     }
 }

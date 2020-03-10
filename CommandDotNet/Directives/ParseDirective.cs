@@ -22,12 +22,12 @@ namespace CommandDotNet.Directives
         // adapted from https://github.com/dotnet/command-line-api directives
         private static Task<int> ConfigureReportHooks(CommandContext commandContext, ExecutionDelegate next)
         {
-            if (commandContext.Tokens.TryGetDirective("parse", out string value))
+            if (commandContext.Tokens.TryGetDirective("parse", out var value))
             {
                 var appConfig = commandContext.AppConfig;
                 var console = commandContext.Console;
 
-                var parts = value.Split(":".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+                var parts = value!.Split(":".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
                 var verbose = parts.Length > 1 && parts[1].Equals("verbose", StringComparison.OrdinalIgnoreCase);
 
                 if (!verbose)
@@ -72,7 +72,7 @@ namespace CommandDotNet.Directives
                 : next(commandContext);
         }
 
-        private static void ReportTransformation(IConsole consoleOut, TokenCollection args, string description)
+        private static void ReportTransformation(IConsole consoleOut, TokenCollection? args, string description)
         {
             consoleOut.Out.WriteLine(description);
 

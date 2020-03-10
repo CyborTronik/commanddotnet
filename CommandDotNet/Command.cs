@@ -14,7 +14,7 @@ namespace CommandDotNet
 {
     public sealed class Command : IArgumentNode
     {
-        private Command _parent;
+        private Command? _parent;
         private readonly List<Option> _options = new List<Option>();
         private readonly List<Option> _optionsForExecutableSubcommands = new List<Option>();
         private readonly List<Operand> _operands = new List<Operand>();
@@ -23,13 +23,13 @@ namespace CommandDotNet
         private readonly Dictionary<string, IArgumentNode> _argumentsByAlias = new Dictionary<string, IArgumentNode>();
 
         public Command(string name, 
-            ICustomAttributeProvider customAttributeProvider = null,
+            ICustomAttributeProvider? customAttributeProvider = null,
             bool isExecutable = true,
-            Command parent = null,
-            string definitionSource = null)
+            Command? parent = null,
+            string? definitionSource = null)
         {
             Name = name.IsNullOrEmpty() 
-                ? throw new ArgumentNullException(name) 
+                ? throw new ArgumentNullException(nameof(name)) 
                 : name;
             CustomAttributes = customAttributeProvider ?? NullCustomAttributeProvider.Instance;
             IsExecutable = isExecutable;
@@ -39,9 +39,9 @@ namespace CommandDotNet
         }
 
         public string Name { get; }
-        public string Description { get; set; }
-        public string Usage { get; set; }
-        public string ExtendedHelpText { get; set; }
+        public string? Description { get; set; }
+        public string? Usage { get; set; }
+        public string? ExtendedHelpText { get; set; }
 
         /// <summary>
         /// When true, the command can be executed.<br/>
@@ -61,12 +61,12 @@ namespace CommandDotNet
         /// Is null for the root command. Some parent commands are not executable
         /// but are defined only to group for other commands.
         /// </summary>
-        public Command Parent
+        public Command? Parent
         {
             get => _parent;
             set
             {
-                if (_parent != null && _parent != value)
+                if (!Equals(_parent, null) && !Equals(_parent, value))
                 {
                     throw new InvalidConfigurationException($"{nameof(Parent)} is already assigned for {this}.  Current={_parent} New={value}");
                 }
@@ -78,7 +78,7 @@ namespace CommandDotNet
         public IReadOnlyCollection<string> Aliases { get; }
 
         /// <summary>The source that defined this command</summary>
-        public string DefinitionSource { get; }
+        public string? DefinitionSource { get; }
 
         /// <summary>The <see cref="Command"/>s that can be accessed via this <see cref="Command"/></summary>
         public IReadOnlyCollection<Command> Subcommands => _subcommands.AsReadOnly();
@@ -89,11 +89,11 @@ namespace CommandDotNet
         /// <summary>The services used by middleware and associated with this <see cref="Command"/></summary>
         public IServices Services { get; } = new Services();
 
-        public IArgumentNode FindArgumentNode(string alias) => 
+        public IArgumentNode? FindArgumentNode(string alias) => 
             _argumentsByAlias.GetValueOrDefault(alias ?? throw new ArgumentNullException(nameof(alias)));
 
         /// <summary>Returns the option for the given alias, if it exists.</summary>
-        public Option FindOption(string alias) =>
+        public Option? FindOption(string alias) =>
             FindArgumentNode(alias) is Option option ? option : null;
 
         internal void AddArgumentNode(IArgumentNode argumentNode)
@@ -139,7 +139,7 @@ namespace CommandDotNet
         {
             operand.Parent = this;
             var lastOperand = Operands.LastOrDefault();
-            if (lastOperand != null && lastOperand.Arity.AllowsMany())
+            if (!Equals(lastOperand, null) && lastOperand.Arity.AllowsMany())
             {
                 var message =
                     $"The last operand '{lastOperand.Name}' accepts multiple values. No more operands can be added.";
@@ -151,7 +151,7 @@ namespace CommandDotNet
 
         private void AddOption(Option option)
         {
-            if (!option.AssignToExecutableSubcommands || option.Parent == null)
+            if (!option.AssignToExecutableSubcommands || Equals(option.Parent, null))
             {
                 option.Parent = this;
             }
@@ -182,16 +182,17 @@ namespace CommandDotNet
         {
             foreach (var parentOrThis in this.GetParentCommands(includeCurrent: true))
             {
-                IArgumentNode duplicatedArg = null;
+                IArgumentNode? duplicatedArg = null;
                 var duplicateAlias = argumentNode.Aliases.FirstOrDefault(a => _argumentsByAlias.TryGetValue(a, out duplicatedArg));
 
                 if (duplicateAlias != null && ReferenceEquals(parentOrThis, this))
                 {
-                    string GetArgNodeName(IArgumentNode arg) => $"{arg.GetType().Name}:{arg.Name}(source:{arg.DefinitionSource})";
+                    string GetArgNodeName(IArgumentNode arg) =>
+                        $"{arg.GetType().Name}:{arg.Name}(source:{arg.DefinitionSource})";
 
                     throw new InvalidConfigurationException(
                         $"Duplicate alias '{duplicateAlias}' added to command '{this.Name}'. " +
-                        $"Duplicates: '{GetArgNodeName(argumentNode)}' & '{GetArgNodeName(duplicatedArg)}'");
+                        $"Duplicates: '{GetArgNodeName(argumentNode)}' & '{GetArgNodeName(duplicatedArg!)}'");
                 }
             }
 
@@ -200,7 +201,7 @@ namespace CommandDotNet
 
         public override string ToString()
         {
-            return $"Command {nameof(Command)}:{Name}  ({DefinitionSource})";
+            return ToString(false);
         }
 
         public string ToString(bool verbose)
@@ -248,7 +249,7 @@ namespace CommandDotNet
         {
             unchecked
             {
-                return ((Name != null ? Name.GetHashCode() : 0) * 397) ^ (Parent != null ? Parent.GetHashCode() : 0);
+                return ((Name != null ? Name.GetHashCode() : 0) * 397) ^ (Parent?.GetHashCode() ?? 0);
             }
         }
     }

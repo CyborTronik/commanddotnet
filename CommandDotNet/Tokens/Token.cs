@@ -17,13 +17,13 @@ namespace CommandDotNet.Tokens
         public TokenType TokenType { get; }
 
         /// <summary>When <see cref="TokenType"/> is <see cref="Tokens.TokenType.Option"/>, this will be populated.</summary>
-        public OptionTokenType OptionTokenType { get; }
+        public OptionTokenType? OptionTokenType { get; }
 
         public Token(
             string rawValue,
             string value, 
             TokenType tokenType, 
-            OptionTokenType optionTokenType = null)
+            OptionTokenType? optionTokenType = null)
         {
             RawValue = rawValue;
             Value = value;

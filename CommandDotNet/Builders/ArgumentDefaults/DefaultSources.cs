@@ -23,12 +23,12 @@ namespace CommandDotNet.Builders.ArgumentDefaults
                 }
             }
 
-            public static Func<IArgument, ArgumentDefault> GetDefaultValue(
-                IDictionary envVars = null,
+            public static Func<IArgument, ArgumentDefault?> GetDefaultValue(
+                IDictionary? envVars = null,
                 params GetArgumentKeysDelegate[] getKeysDelegates)
             {
-                envVars = envVars ?? Environment.GetEnvironmentVariables();
-                getKeysDelegates = getKeysDelegates ?? new GetArgumentKeysDelegate[]
+                envVars ??= Environment.GetEnvironmentVariables();
+                getKeysDelegates ??= new GetArgumentKeysDelegate[]
                 {
                     GetKeyFromAttribute
                 };
@@ -62,16 +62,19 @@ namespace CommandDotNet.Builders.ArgumentDefaults
                 var keys = argument.SwitchFunc(o => o.Name.ToEnumerable(), GetOptionKeys);
                 foreach (var key in keys)
                 {
-                    yield return $"{argument.Parent.Name} {key}";
+                    if (!Equals(argument.Parent, null))
+                    {
+                        yield return $"{argument.Parent.Name} {key}";
+                    }
                     yield return key;
                 }
             }
 
-            public static Func<IArgument, ArgumentDefault> GetDefaultValue(
+            public static Func<IArgument, ArgumentDefault?> GetDefaultValue(
                 NameValueCollection appSettings,
                 params GetArgumentKeysDelegate[] getKeysCallbacks)
             {
-                getKeysCallbacks = getKeysCallbacks ?? new GetArgumentKeysDelegate[]
+                getKeysCallbacks ??= new GetArgumentKeysDelegate[]
                 {
                     GetKeyFromAttribute
                 };
@@ -82,10 +85,10 @@ namespace CommandDotNet.Builders.ArgumentDefaults
             }
         }
 
-        private static Func<IArgument, ArgumentDefault> GetValue(
+        private static Func<IArgument, ArgumentDefault?> GetValue(
             string sourceName,
             GetArgumentKeysDelegate[] getKeys, 
-            Func<string, string> getValueFromSource)
+            Func<string, string?> getValueFromSource)
         {
             return argument =>
             {

@@ -11,9 +11,9 @@ namespace CommandDotNet.ClassModeling
     {
         internal static Task<int> ResolveCommandClassInstances(CommandContext commandContext, ExecutionDelegate next)
         {
-            var pipeline = commandContext.InvocationPipeline;
+            var pipeline = commandContext.InvocationPipeline!;
 
-            InvocationStep parentStep = null;
+            InvocationStep? parentStep = null;
             foreach (var ic in pipeline.All)
             {
                 if (parentStep != null 
@@ -30,8 +30,9 @@ namespace CommandDotNet.ClassModeling
             return next(commandContext);
         }
 
-        private static object GetInstance(InvocationStep invocationStep,
-            InvocationStep parentStep,
+        private static object? GetInstance(
+            InvocationStep invocationStep,
+            InvocationStep? parentStep,
             CommandContext commandContext)
         {
             var command = invocationStep.Command;
@@ -43,21 +44,18 @@ namespace CommandDotNet.ClassModeling
 
             var classType = commandDef.CommandHostClassType;
             var instance = commandContext.AppConfig.ResolverService.ResolveCommandClass(classType, commandContext);
-            if (instance != null)
-            {
-                SetInstanceOnParent(parentStep, classType, instance);
-            }
+            SetInstanceOnParent(parentStep, classType, instance);
             return instance;
         }
 
-        private static void SetInstanceOnParent(InvocationStep parentStep, Type classType, object instance)
+        private static void SetInstanceOnParent(InvocationStep? parentStep, Type classType, object instance)
         {
             if (parentStep == null)
             {
                 return;
             }
 
-            var parent = parentStep.Instance;
+            var parent = parentStep.Instance!;
             parent.GetType().GetProperties()
                 .Where(p =>
                     p.CanWrite

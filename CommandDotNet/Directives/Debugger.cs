@@ -13,7 +13,7 @@ namespace CommandDotNet.Directives
         /// <summary>Attaches a debugger if the [debug] directive exists</summary>
         public static void AttachIfDebugDirective(string[] args, 
             CancellationToken? cancellationToken = null, 
-            IConsole console = null)
+            IConsole? console = null)
         {
             if (args.HasDebugDirective())
             {

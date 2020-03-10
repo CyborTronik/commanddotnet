@@ -4,9 +4,9 @@ namespace CommandDotNet
 {
     public static class ContextDataExtensions
     {
-        public static T GetOrAdd<T>(this IServices services, Func<T> create)
+        public static T GetOrAdd<T>(this IServices services, Func<T> create) where T: class
         {
-            var service = services.Get<T>();
+            var service = services.GetOrDefault<T>();
 
             if (service == null)
             {

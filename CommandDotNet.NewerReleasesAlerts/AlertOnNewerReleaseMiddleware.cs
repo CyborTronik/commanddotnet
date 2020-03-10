@@ -61,7 +61,7 @@ namespace CommandDotNet.NewerReleasesAlerts
 
         private static Task<int> AlertOnNewVersion(CommandContext context, ExecutionDelegate next)
         {
-            var config = context.AppConfig.Services.Get<NewerReleaseConfig>();
+            var config = context.AppConfig.Services.GetOrDefault<NewerReleaseConfig>();
 
             var skipCommand = config.SkipCommand?.Invoke(context.ParseResult.TargetCommand) ?? false;
             if (!skipCommand)

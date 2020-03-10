@@ -9,7 +9,7 @@ namespace CommandDotNet.ClassModeling.Definitions
         bool IsExecutable { get; }
         bool HasInterceptor { get; }
         IReadOnlyCollection<ICommandDef> SubCommands { get; }
-        IMethodDef InterceptorMethodDef { get; }
-        IMethodDef InvokeMethodDef { get; }
+        IMethodDef? InterceptorMethodDef { get; }
+        IMethodDef? InvokeMethodDef { get; }
     }
 }

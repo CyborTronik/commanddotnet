@@ -52,7 +52,7 @@ namespace CommandDotNet.Tests.FeatureTests
 
         private Task<int> Cancel(CommandContext context, ExecutionDelegate next)
         {
-            context.AppConfig.Services.Get<CancellationTokenSource>().Cancel();
+            context.AppConfig.Services.GetOrDefault<CancellationTokenSource>().Cancel();
             return next(context);
         }
 

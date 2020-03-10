@@ -17,7 +17,7 @@ namespace CommandDotNet.ClassModeling.Definitions
         public bool IsExecutable => true;
         public bool HasInterceptor => false;
         public IReadOnlyCollection<ICommandDef> SubCommands { get; } = new List<ICommandDef>().AsReadOnly();
-        public IMethodDef InterceptorMethodDef { get; } = NullMethodDef.Instance;
+        public IMethodDef? InterceptorMethodDef { get; } = null;
         public IMethodDef InvokeMethodDef { get; }
         
         public MethodCommandDef(MethodInfo method, Type commandHostClassType, AppConfig appConfig)

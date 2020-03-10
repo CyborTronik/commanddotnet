@@ -11,10 +11,9 @@ namespace CommandDotNet.Extensions
             return attributeProvider.IsDefined(typeof(T), true);
         }
         
-        internal static T GetCustomAttribute<T>(this ICustomAttributeProvider attributeProvider) where T : Attribute
+        internal static T? GetCustomAttribute<T>(this ICustomAttributeProvider attributeProvider) where T : Attribute
         {
-            T attribute = (T)attributeProvider.GetCustomAttributes(typeof(T), false).SingleOrDefault();
-            return attribute;
+            return (T)attributeProvider.GetCustomAttributes(typeof(T), false).SingleOrDefault();
         }
     }
 }

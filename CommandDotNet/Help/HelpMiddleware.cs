@@ -39,7 +39,7 @@ namespace CommandDotNet.Help
 
         private static Task<int> DisplayHelp(CommandContext commandContext, ExecutionDelegate next)
         {
-            var parseResult = commandContext.ParseResult;
+            var parseResult = commandContext.ParseResult!;
             var targetCommand = parseResult.TargetCommand;
 
             if (parseResult.ParseError != null)

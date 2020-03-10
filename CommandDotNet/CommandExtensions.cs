@@ -6,7 +6,7 @@ namespace CommandDotNet
 {
     public static class CommandExtensions
     {
-        public static bool IsRootCommand(this Command command) => command.Parent == null;
+        public static bool IsRootCommand(this Command command) => Equals(command.Parent, null);
 
         /// <summary>Get the root command</summary>
         public static Command GetRootCommand(this Command command) => command.GetParentCommands(true).Last();
@@ -36,7 +36,7 @@ namespace CommandDotNet
         public static IEnumerable<Command> GetParentCommands(this Command command, bool includeCurrent = false)
         {
             var startingCommand = includeCurrent ? command : command.Parent;
-            for (var c = startingCommand; c != null; c = c.Parent)
+            for (var c = startingCommand; !Equals(c, null); c = c.Parent)
             {
                 yield return c;
             }
@@ -84,7 +84,7 @@ namespace CommandDotNet
             command.FindInputValues(alias)?.Any() ?? false;
 
         /// <summary>Returns the input values for the argument with the given alias or null</summary>
-        public static ICollection<InputValue> FindInputValues(this Command command, string alias) => 
+        public static ICollection<InputValue>? FindInputValues(this Command command, string alias) => 
             command.FindArgumentNode(alias) is IArgument argument ? argument.InputValues : null;
     }
 }

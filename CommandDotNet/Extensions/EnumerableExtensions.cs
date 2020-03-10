@@ -20,7 +20,7 @@ namespace CommandDotNet.Extensions
 
         public static IReadOnlyCollection<T> ToReadOnlyCollection<T>(this IEnumerable<T> items) => items as IReadOnlyCollection<T> ?? items.ToList().AsReadOnly();
 
-        public static string ToCsv(this IEnumerable<string> items, string separator = ",")
+        public static string ToCsv(this IEnumerable<string?> items, string separator = ",")
         {
             return string.Join(separator, items);
         }
@@ -36,7 +36,7 @@ namespace CommandDotNet.Extensions
         }
 
         /// <summary>Joins the string into a sorted delimited string. Useful for logging.</summary>
-        public static string ToOrderedCsv(this IEnumerable<string> items, string separator = ",")
+        public static string ToOrderedCsv(this IEnumerable<string?> items, string separator = ",")
         {
             return items.OrderBy(i => i).ToCsv(separator);
         }

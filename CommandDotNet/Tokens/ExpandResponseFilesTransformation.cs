@@ -30,7 +30,7 @@ namespace CommandDotNet.Tokens
                     .ReadAllLines(filePath)
                     .Where(l => !l.IsCommentOrNullOrWhitespace())
                     .SelectMany(l => splitter.Split(l))
-                    .Tokenize(includeDirectives: false);
+                    .Tokenize(false);
 
                 foreach (var newToken in tokens)
                 {
@@ -39,7 +39,7 @@ namespace CommandDotNet.Tokens
             }
         }
 
-        private static string GetFilePath(Token token)
+        private static string? GetFilePath(Token token)
         {
             if (token.TokenType == TokenType.Value && token.Value.StartsWith("@"))
             {

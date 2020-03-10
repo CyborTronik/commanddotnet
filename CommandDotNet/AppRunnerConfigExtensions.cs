@@ -95,7 +95,7 @@ namespace CommandDotNet
         public static AppRunner UseDependencyResolver(
             this AppRunner appRunner, 
             IDependencyResolver dependencyResolver,
-            Func<CommandContext, IDisposable> runInScope = null,
+            Func<CommandContext, IDisposable>? runInScope = null,
             ResolveStrategy argumentModelResolveStrategy = ResolveStrategy.TryResolve,
             ResolveStrategy commandClassResolveStrategy = ResolveStrategy.Resolve,
             bool useLegacyInjectDependenciesAttribute = false)
@@ -139,10 +139,10 @@ namespace CommandDotNet
         /// </param>
         public static AppRunner UsePrompting(
             this AppRunner appRunner,
-            Func<CommandContext, IPrompter> prompterOverride = null,
+            Func<CommandContext, IPrompter>? prompterOverride = null,
             bool promptForMissingArguments = true,
-            Func<CommandContext, IArgument, string> argumentPromptTextOverride = null,
-            Predicate<IArgument> argumentFilter = null)
+            Func<CommandContext, IArgument, string>? argumentPromptTextOverride = null,
+            Predicate<IArgument>? argumentFilter = null)
         {
             return ValuePromptMiddleware.UsePrompting(appRunner, prompterOverride, promptForMissingArguments, argumentPromptTextOverride, argumentFilter);
         }
@@ -194,7 +194,7 @@ namespace CommandDotNet
         /// When <see cref="EnvVarAttribute"/> is present, looks for the key in the provided envVars config.<br/>
         /// If envVars is not provided the default <see cref="Environment.GetEnvironmentVariables()"/>
         /// </summary>
-        public static AppRunner UseDefaultsFromEnvVar(this AppRunner appRunner, IDictionary envVars = null)
+        public static AppRunner UseDefaultsFromEnvVar(this AppRunner appRunner, IDictionary? envVars = null)
         {
             return appRunner.UseDefaultsFromConfig(
                 DefaultSources.EnvVar.GetDefaultValue(envVars, DefaultSources.EnvVar.GetKeyFromAttribute));
@@ -202,9 +202,9 @@ namespace CommandDotNet
 
         [Obsolete("Use the UseDefaultsFromConfig that returns ArgumentDefaults")]
         public static AppRunner UseDefaultsFromConfig(this AppRunner appRunner,
-            params Func<IArgument, string>[] getDefaultValueCallbacks)
+            params Func<IArgument, string?>[] getDefaultValueCallbacks)
         {
-            Func<IArgument, ArgumentDefault> Convert(Func<IArgument, string> function)
+            Func<IArgument, ArgumentDefault?> Convert(Func<IArgument, string> function)
             {
                 return arg => new ArgumentDefault("UseDefaultsFromConfig", "", function(arg));
             }
@@ -213,7 +213,7 @@ namespace CommandDotNet
 
         /// <summary>Provide your own strategies for setting argument defaults from a configuration source</summary>
         public static AppRunner UseDefaultsFromConfig(this AppRunner appRunner,
-            params Func<IArgument, ArgumentDefault>[] getDefaultValueCallbacks)
+            params Func<IArgument, ArgumentDefault?>[] getDefaultValueCallbacks)
             => SetArgumentDefaultsMiddleware.SetArgumentDefaultsFrom(appRunner, getDefaultValueCallbacks);
 
         /// <summary>

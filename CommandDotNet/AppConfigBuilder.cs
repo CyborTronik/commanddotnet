@@ -40,10 +40,10 @@ namespace CommandDotNet
         /// properties decorated with <see cref="InjectPropertyAttribute"/><br/>
         /// use appRunner.UseDependencyResolver(...) extension method to set this instance.
         /// </summary>
-        public IDependencyResolver DependencyResolver { get; internal set; }
+        public IDependencyResolver? DependencyResolver { get; internal set; }
 
         /// <summary>Replace the internal help provider with given help provider</summary>
-        public IHelpProvider CustomHelpProvider { get; set; }
+        public IHelpProvider? CustomHelpProvider { get; set; }
 
         /// <summary>
         /// Add a name transformation to enforce name consistency across commands, operands and options.<br/>
@@ -54,7 +54,7 @@ namespace CommandDotNet
         /// <remarks>
         /// To enforce casing rules, configure `appRunner.UseNameCasing(...)` from the nuget package CommandDotNet.NameCasing
         /// </remarks>
-        public NameTransformation NameTransformation { get; set; }
+        public NameTransformation? NameTransformation { get; set; }
 
         /// <summary>Replace the internal system console with provided console</summary>
         public IConsole Console { get; set; } = new SystemConsole();
@@ -70,7 +70,7 @@ namespace CommandDotNet
         /// Use this to cleanup any events after the run.<br/>
         /// This is useful for tests and when using new AppRunner instances to create a cli session.
         /// </summary>
-        public event Action<OnRunCompletedEventArgs> OnRunCompleted;
+        public event Action<OnRunCompletedEventArgs>? OnRunCompleted;
 
         public BuildEvents BuildEvents { get; } = new BuildEvents();
         public TokenizationEvents TokenizationEvents { get; } = new TokenizationEvents();
@@ -130,19 +130,20 @@ namespace CommandDotNet
         internal AppConfig Build()
         {
             var helpProvider = CustomHelpProvider ?? HelpTextProviderFactory.Create(AppSettings);
-            
+
+            var middlewarePipeline = _middlewareByStage
+                .SelectMany(kvp => kvp.Value.Select(v => new {stage = kvp.Key, v.order, v.middleware}) )
+                .OrderBy(m => m.stage)
+                .ThenBy(m => m.order)
+                .Select(m => m.middleware).ToArray();
+
+            var tokenTransformations = _tokenTransformationsByName.Values.OrderBy(t => t.Order).ToArray();
+
             return new AppConfig(
                 AppSettings, Console, DependencyResolver, helpProvider, NameTransformation,
                 OnRunCompleted, TokenizationEvents, BuildEvents, Services, 
-                CancellationToken, _parameterResolversByType)
-            {
-                MiddlewarePipeline = _middlewareByStage
-                    .SelectMany(kvp => kvp.Value.Select(v => new {stage = kvp.Key, v.order, v.middleware}) )
-                    .OrderBy(m => m.stage)
-                    .ThenBy(m => m.order)
-                    .Select(m => m.middleware).ToArray(),
-                TokenTransformations = _tokenTransformationsByName.Values.OrderBy(t => t.Order).ToArray()
-            };
+                CancellationToken, _parameterResolversByType, 
+                middlewarePipeline, tokenTransformations);
         }
     }
 }

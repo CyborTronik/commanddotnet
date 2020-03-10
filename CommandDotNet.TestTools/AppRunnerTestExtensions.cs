@@ -62,7 +62,7 @@ namespace CommandDotNet.TestTools
                 LogResult();
                 return new AppRunnerResult(exitCode, testConsole, outputs);
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 if (returnResultOnError)
                 {

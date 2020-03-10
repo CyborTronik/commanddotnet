@@ -15,7 +15,7 @@ namespace CommandDotNet.FluentValidation
 
         private static Task<int> Middleware(CommandContext commandContext, ExecutionDelegate next)
         {
-            var modelValidator = new ModelValidator(commandContext.AppConfig.DependencyResolver);
+            var modelValidator = new ModelValidator(commandContext.DependencyResolver);
 
             var paramValues = commandContext.InvocationPipeline
                 .All

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using CommandDotNet.Execution;
 
 namespace CommandDotNet.Directives
@@ -28,7 +27,7 @@ namespace CommandDotNet.Directives
                 Debugger.Attach(
                     commandContext.AppConfig.CancellationToken,
                     commandContext.Console,
-                    commandContext.AppConfig.Services.Get<DebugDirectiveContext>().WaitForDebuggerToAttach);
+                    commandContext.AppConfig.Services.GetOrThrow<DebugDirectiveContext>().WaitForDebuggerToAttach);
             }
 
             return next(commandContext);
